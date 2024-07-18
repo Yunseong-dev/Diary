@@ -29,4 +29,12 @@ public class AuthController {
         return userService.loginUser(dto);
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<?> loginUser(
+            HttpServletRequest request
+    ) {
+        String refreshToken = request.getHeader("Authorization").replace("Bearer ", "");
+        return userService.refreshToken(refreshToken);
+    }
+
 }

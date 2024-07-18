@@ -73,4 +73,15 @@ public class JwtTokenProvider {
         return getClaims(token).getSubject();
     }
 
+    public boolean validateRefreshToken(String token, User user) {
+        Claims claims = getClaims(token);
+        if (claims.getExpiration().before(new Date())) {
+            return false;
+        }
+        if (!claims.getSubject().equals(user.getId())) {
+            return false;
+        }
+        return true;
+    }
+
 }

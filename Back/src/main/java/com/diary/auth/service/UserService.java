@@ -63,4 +63,20 @@ public class UserService {
         return ResponseEntity.ok().body(new TokenDto(accessToken, refreshToken));
     }
 
+    public ResponseEntity<?> refreshToken(String refreshToken) {
+        Token token = tokenRepository.findByRefreshToken(refreshToken);
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("토큰이 존재하지 않습니다.");
+        }
+
+        User user = token.getUser();
+        if (!jwtTokenProvider.validateRefreshToken(refreshToken, user)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("잘못된 토큰을 가지고 있습니다.");
+        }
+
+        String newAccessToken = jwtTokenProvider.generateAccessToken(refreshToken);
+
+        return ResponseEntity.ok().body(new TokenDto(newAccessToken, refreshToken));
+    }
+
 }
