@@ -18,6 +18,13 @@ import java.util.List;
 public class DiaryController {
     private DiaryService diaryService;
 
+    @GetMapping("/get")
+    public List<Diary> getDiary(
+            @AuthenticationPrincipal User currentUser
+    ) {
+        return diaryService.getDiary(currentUser);
+    }
+
     @PostMapping("/write")
     public ResponseEntity<?> writeDiary(
             @RequestBody DiaryDto dto,
@@ -40,12 +47,5 @@ public class DiaryController {
             @AuthenticationPrincipal User currentUser
     ) {
         return diaryService.deleteDiary(dto, currentUser);
-    }
-
-    @GetMapping("/get")
-    public List<Diary> getDiary(
-            @AuthenticationPrincipal User currentUser
-    ) {
-        return diaryService.getDiary(currentUser);
     }
 }
