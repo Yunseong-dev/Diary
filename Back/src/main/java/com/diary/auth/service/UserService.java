@@ -3,8 +3,10 @@ package com.diary.auth.service;
 import com.diary.auth.dto.CreateUserDto;
 import com.diary.auth.dto.LoginUserDto;
 import com.diary.auth.dto.TokenDto;
+import com.diary.auth.model.BlacklistToken;
 import com.diary.auth.model.Token;
 import com.diary.auth.model.User;
+import com.diary.auth.repository.BlacklistTokenRepository;
 import com.diary.auth.repository.TokenRepository;
 import com.diary.auth.repository.UserRepository;
 import com.diary.auth.security.JwtTokenProvider;
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class UserService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
+    private final BlacklistTokenRepository blacklistTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
@@ -86,6 +89,24 @@ public class UserService {
         String newAccessToken = jwtTokenProvider.generateAccessToken(refreshToken);
 
         return ResponseEntity.ok().body(new TokenDto(newAccessToken, refreshToken));
+    }
+
+    public ResponseEntity<?> logoutUser(User user) {
+        Optional<Token> tokenOptional = tokenRepository.findByUser(user);
+        if (tokenOptional.isPresent()) {
+            Token token = tokenOptional.get();
+            BlacklistToken blacklistToken = new BlacklistToken(
+                    token.getRefreshToken(),
+                    user.getId()
+            );
+            blacklistTokenRepository.save(blacklistToken);
+
+            tokenRepository.delete(token);
+
+            return ResponseEntity.ok().body("로그아웃이 성공적으로 완료되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("로그인된 상태가 아닙니다.");
+        }
     }
 
 }

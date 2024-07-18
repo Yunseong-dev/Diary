@@ -1,6 +1,7 @@
 package com.diary.auth.security;
 
 import com.diary.auth.model.User;
+import com.diary.auth.repository.BlacklistTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -22,7 +23,13 @@ public class JwtTokenProvider {
     @Value("${app.jwtRefreshExpirationInMs}")
     private long jwtRefreshExpirationInMs;
 
+    private final BlacklistTokenRepository blacklistTokenRepository;
+
     private Key jwtKey;
+
+    public JwtTokenProvider(BlacklistTokenRepository blacklistTokenRepository) {
+        this.blacklistTokenRepository = blacklistTokenRepository;
+    }
 
     @PostConstruct
     public void init() {
@@ -79,6 +86,9 @@ public class JwtTokenProvider {
             return false;
         }
         if (!claims.getSubject().equals(user.getId())) {
+            return false;
+        }
+        if (blacklistTokenRepository.existsByToken(token)) {
             return false;
         }
         return true;

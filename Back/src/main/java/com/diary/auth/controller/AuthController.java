@@ -2,10 +2,12 @@ package com.diary.auth.controller;
 
 import com.diary.auth.dto.CreateUserDto;
 import com.diary.auth.dto.LoginUserDto;
+import com.diary.auth.model.User;
 import com.diary.auth.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
@@ -35,6 +37,13 @@ public class AuthController {
     ) {
         String refreshToken = request.getHeader("Authorization").replace("Bearer ", "");
         return userService.refreshToken(refreshToken);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(
+            @AuthenticationPrincipal User currentUser
+    ) {
+        return userService.logoutUser(currentUser);
     }
 
 }
