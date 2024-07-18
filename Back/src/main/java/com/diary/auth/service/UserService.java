@@ -54,7 +54,7 @@ public class UserService {
         String accessToken = jwtTokenProvider.generateAccessToken(refreshToken);
 
         Token token = new Token(
-                UUID.randomUUID().toString(),
+                UUID.randomUUID(),
                 user,
                 refreshToken
         );

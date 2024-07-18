@@ -18,8 +18,7 @@ import java.util.UUID;
 public class Token {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private UUID id;
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
