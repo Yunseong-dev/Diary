@@ -50,17 +50,24 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 일치하지 않습니다.");
         }
 
-        String refreshToken = jwtTokenProvider.generateRefreshToken(user);
-        String accessToken = jwtTokenProvider.generateAccessToken(refreshToken);
+        Token token = tokenRepository.findByUser(user);
+        if (token != null){
+            String accessToken = jwtTokenProvider.generateAccessToken(token.getRefreshToken());
+            return ResponseEntity.ok().body(new TokenDto(accessToken, token.getRefreshToken()));
+        }
+        else {
+            String refreshToken = jwtTokenProvider.generateRefreshToken(user);
+            String accessToken = jwtTokenProvider.generateAccessToken(refreshToken);
 
-        Token token = new Token(
-                UUID.randomUUID(),
-                user,
-                refreshToken
-        );
-        tokenRepository.save(token);
+            Token newToken = new Token(
+                    UUID.randomUUID(),
+                    user,
+                    refreshToken
+            );
+            tokenRepository.save(newToken);
 
-        return ResponseEntity.ok().body(new TokenDto(accessToken, refreshToken));
+            return ResponseEntity.ok().body(new TokenDto(accessToken, refreshToken));
+        }
     }
 
     public ResponseEntity<?> refreshToken(String refreshToken) {
