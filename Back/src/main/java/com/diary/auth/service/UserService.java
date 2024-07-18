@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -50,8 +51,9 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 일치하지 않습니다.");
         }
 
-        Token token = tokenRepository.findByUser(user);
-        if (token != null){
+        Optional<Token> tokenOptional = tokenRepository.findByUser(user);
+        if (tokenOptional.isPresent()) {
+            Token token = tokenOptional.get();
             String accessToken = jwtTokenProvider.generateAccessToken(token.getRefreshToken());
             return ResponseEntity.ok().body(new TokenDto(accessToken, token.getRefreshToken()));
         }
