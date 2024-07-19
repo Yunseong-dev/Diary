@@ -97,7 +97,7 @@ public class UserService {
             Token token = tokenOptional.get();
             BlacklistToken blacklistToken = new BlacklistToken(
                     token.getRefreshToken(),
-                    user.getId()
+                    user
             );
             blacklistTokenRepository.save(blacklistToken);
 

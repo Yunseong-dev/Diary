@@ -32,7 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> loginUser(
+    public ResponseEntity<?> refresh(
             HttpServletRequest request
     ) {
         String refreshToken = request.getHeader("Authorization").replace("Bearer ", "");
